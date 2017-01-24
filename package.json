@@ -1,0 +1,28 @@
+{
+  "name": "Bellhop",
+  "version": "1.0.0",
+  "description": "Tweets whenever your doorbell is pushed. Built for C.H.I.P.",
+
+  "author": {
+    "name": "Charlton Trezevant",
+    "url": "https://www.ctis.me/"
+  },
+
+  "homepage": "https://github.com/ctrezevant/bellhop",
+
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ctrezevant/bellhop"
+  },
+
+  "dependencies": {
+    "twit": "~2.2.5",
+    "johnny-five": "~0.10.6",
+    "chip-io": "~2.1.0",
+  },
+
+  "devDependencies": {},
+  "bundleDependencies": [],
+  "private": false,
+  "main": "main.js"
+}
