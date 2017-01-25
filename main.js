@@ -1,39 +1,37 @@
 // Tweeting Doorbell (c) 2017 Charlton Trezevant
 // MIT License
 // Enjoy!
-var CONFIG = require('./config.js'); // Configuration file
-var j5 = require('johnny-five');
+
+var CONFIG = require('./config.js'); // Load configuration file
+var five = require('johnny-five');
 var CHIP = require("chip-io");
-var board = new j5.Board({
-    io: new CHIP()
-});
+var board = new five.Board({ io: new CHIP() });
 
 var Twit = require('twit');
 var T = new Twit(CONFIG.TWITTER_API_KEYS);
 
 board.on("ready", function() {
-    postInitialStatus();
-    var bell = new j5.Button(CONFIG.BELL.pin);
-    bell.on('hit', sendPress);
+    postInitialStatus(); // Send tweet saying the script has started up
+    var bell = CONFIG.BELL.pin || new CHIP.OnboardButton(); // If no pin specified in config, it means we are using the onboard button to test
+    bell.on('down', sendPress);
 });
 
 function sendPress() {
-    // Debounces tweet notifications: only send a tweet if one has not yet been sent
+    // Debounces tweet notifications: only send a tweet if one has not yet been sent,
     // OR if a subsequent press has happened in a time equal to or greater than the defined time to wait.
 
     if (CONFIG.BELL.lastTweetSent === null || elapsedTime(CONFIG.BELL.lastTweetSent, Date.now()) >= CONFIG.BELL.debounceTime) {
-        notify(CONFIG.COMMAND_RESPONSE_MAP.doorbellNotification());
+        notify(CONFIG.COMMAND_RESPONSE_MAP.doorbellNotification.response());
         CONFIG.BELL.lastTweetSent = Date.now();
     }
 }
 
 function postInitialStatus() {
-    // Send a tweet whenever this script is started for status display. 
     T.post('statuses/update', {
         status: CONFIG.COMMAND_RESPONSE_MAP.startup.response()
     }, function(err, data, response) {
         if (err)
-            console.info("[" + getTime() + "] BELLBOT_DEBUG: " + JSON.stringify(err));
+            console.info("[" + getTime() + "] BELLBOT_DEBUG: error in postInitialStatus() - " + JSON.stringify(err));
     });
 }
 
@@ -53,11 +51,11 @@ function notify(text) {
 
     T.post('statuses/update', params, function(err, data, response) {
         if (err)
-            console.info("[" + getTime() + "] DOORBOT_DEBUG: " + JSON.stringify(err));
+            console.info("[" + getTime() + "] BELLBOT_DEBUG: error in notify() - " + JSON.stringify(err));
     });
 }
 
-// Computes elapsed time (for debouncing)
+// Computes elapsed time (used for debouncing)
 function elapsedTime(startTime, endTime) {
     return ((endTime - startTime) / 1000);
 }
