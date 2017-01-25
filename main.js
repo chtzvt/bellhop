@@ -12,7 +12,7 @@ var T = new Twit(CONFIG.TWITTER_API_KEYS);
 
 board.on("ready", function() {
     postInitialStatus(); // Send tweet saying the script has started up
-    var bell = CONFIG.BELL.pin || new CHIP.OnboardButton(); // If no pin specified in config, it means we are using the onboard button to test
+    bell = new five.Button(CONFIG.BELL.pin || 'BTN'); // If no pin specified in config, it means we are using the onboard button to test by default
     bell.on('down', sendPress);
 });
 
